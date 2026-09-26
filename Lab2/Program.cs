@@ -104,7 +104,7 @@ public class DeliverySevice
     private readonly List<Shipment> _shipments = new();
     public void Add(Shipment s)
     {
-        if (s = null) throw new ArgumentNullException(nameof(s));
+        if (s == null) throw new ArgumentNullException(nameof(s));
         _shipments.Add(s);
     }
     public IReadOnlyList<Shipment> All => _shipments;
