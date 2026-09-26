@@ -34,3 +34,18 @@
         return TotalCost().CompareTo(other.TotalCost());
     }
 }
+
+public class Letter : Shipment
+{
+    private readonly bool _registered;
+    public bool Registered => _registered;
+    public Letter(string number, double weight, bool urgent, bool registered)
+        : base(number, weight, urgent)
+    {
+        _registered = registered;
+    }
+    public override double BaseCost() => _registered ? 70.0 : 50.0;
+    public override string ToString()
+        => base.ToString() + (_registered ? ", заказное" : ", простое");
+}
+
