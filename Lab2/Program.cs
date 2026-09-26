@@ -49,3 +49,23 @@ public class Letter : Shipment
         => base.ToString() + (_registered ? ", заказное" : ", простое");
 }
 
+public class Parcel : Shipment
+{
+    private readonly double _length, _width, _height;
+    public double Length => _length;
+    public double Width => _width;
+    public double Height => _height;
+    public double Volume => _length * _width * _height;
+
+    public Parcel(string number, double weight, bool urgent,
+                  double length, double width, double height)
+        : base(number, weight, urgent)
+    {
+        if (length <= 0 || width <= 0 || height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(length), "Габариты должны быть > 0.");
+        _length = length;
+        _width = width;
+        _height = height;
+    }
+    public override double BaseCost() => 100.0 + 30.0 * Weight;
+}
