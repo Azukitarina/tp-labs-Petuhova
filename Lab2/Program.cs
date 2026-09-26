@@ -69,3 +69,32 @@ public class Parcel : Shipment
     }
     public override double BaseCost() => 100.0 + 30.0 * Weight;
 }
+
+public class Oversized : Shipment
+{
+    private readonly double _length, _width, _height;
+
+    public double Length => _length;
+    public double Width => _width;
+    public double Height => _height;
+    public double Volume => _length * _width * _height;
+    public Oversized(string number, double weight, bool urgent,
+                     double length, double width, double height)
+        : base(number, weight, urgent)
+    {
+        if (length <= 0 || width <= 0 || height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(length), "Габариты должны быть > 0.");
+        _length = length;
+        _width = width;
+        _height = height;
+    }
+    public override double BaseCost() => 200.0 + 500.0 * Volume;
+    public override double TotalCost()
+    {
+        double cost = BaseCost();
+        if (Urgent) cost *= 2.0;
+        return cost;
+    }
+    public override string ToString()
+        => base.ToString() + $", объем {Volume:F3} м^3"
+}
