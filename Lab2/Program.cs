@@ -96,10 +96,10 @@ public class Oversized : Shipment
         return cost;
     }
     public override string ToString()
-        => base.ToString() + $", объем {Volume:F3} м^3"
+        => base.ToString() + $", объем {Volume:F3} м^3";
 }
 
-public class DeliverySevice
+public class DeliveryService
 {
     private readonly List<Shipment> _shipments = new();
     public void Add(Shipment s)
@@ -114,4 +114,39 @@ public class DeliverySevice
         => _shipments.OrderByDescending(s => s.TotalCost()).FirstOrDefault();
     public IEnumerable<IGrouping<string, Shipment>> ByType()
         => _shipments.GroupBy(s => s.GetType().Name);
+}
+
+class Program                                            
+{
+    static void Main()
+    {
+        var service = new DeliveryService();
+
+        service.Add(new Letter("L-001", 0.02, urgent: false, registered: false));
+        service.Add(new Letter("L-002", 0.03, urgent: true, registered: true));
+        service.Add(new Parcel("P-101", 2.5, urgent: false, 30, 20, 15));
+        service.Add(new Parcel("P-102", 5.0, urgent: true, 40, 30, 20));
+        service.Add(new Oversized("O-201", 40.0, urgent: false, 1.5, 1.0, 0.8));
+        service.Add(new Oversized("O-202", 80.0, urgent: true, 2.0, 1.5, 1.0));
+
+        Console.WriteLine("Все отправления");
+        foreach (var s in service.All)
+            Console.WriteLine(s);
+
+        Console.WriteLine();
+        Console.WriteLine($"Всего отправлений:    {service.All.Count}");
+        Console.WriteLine($"Срочных:              {service.UrgentCount()}");
+        Console.WriteLine($"Суммарная выручка:    {service.TotalRevenue():F2} руб.");
+
+        var top = service.MostExpensive();
+        Console.WriteLine($"Самое дорогое:        {top}");
+
+        Console.WriteLine();
+        Console.WriteLine("По типам");
+        foreach (var group in service.ByType())
+        {
+            Console.WriteLine($"{group.Key}: {group.Count()} шт., " +
+                              $"выручка {group.Sum(s => s.TotalCost()):F2} руб.");
+        }
+    }
 }
