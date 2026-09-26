@@ -98,3 +98,20 @@ public class Oversized : Shipment
     public override string ToString()
         => base.ToString() + $", объем {Volume:F3} м^3"
 }
+
+public class DeliverySevice
+{
+    private readonly List<Shipment> _shipments = new();
+    public void Add(Shipment s)
+    {
+        if (s = null) throw new ArgumentNullException(nameof(s));
+        _shipments.Add(s);
+    }
+    public IReadOnlyList<Shipment> All => _shipments;
+    public double TotalRevenue() => _shipments.Sum(s => s.TotalCost());
+    public int UrgentCount() => _shipments.Count(s => s.Urgent);
+    public Shipment? MostExpensive()
+        => _shipments.OrderByDescending(s => s.TotalCost()).FirstOrDefault();
+    public IEnumerable<IGrouping<string, Shipment>> ByType()
+        => _shipments.GroupBy(s => s.GetType().Name);
+}
