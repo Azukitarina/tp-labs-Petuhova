@@ -27,5 +27,10 @@ namespace Lab2
             IsUrgent = isUrgent;
         }
         public abstract decimal CalculateCost();
+        public override string ToString()
+        {
+            string urgency = IsUrgent ? "Срочно" : "Обычно";
+            return $"{GetType().Name}: Трек {TrackingNumber}, Вес {Weight} кг ({urgency})";
+        }
     }
 }

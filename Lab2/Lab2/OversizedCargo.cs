@@ -23,5 +23,9 @@ namespace Lab2
                 baseCost *= 1.8m;
             return baseCost;
         }
+        public override string ToString()
+        {
+            return base.ToString() + $", Объем {Volume} м^3";
+        }
     }
 }
