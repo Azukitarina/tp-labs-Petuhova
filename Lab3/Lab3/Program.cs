@@ -9,6 +9,16 @@
                 if (currentDepth > maxDepth) return;
                 string[] direcories = Directory.GetDirectories(path);
                 string[] files = Directory.GetFiles(path);
+                try
+                {
+                    direcories = Directory.GetDirectories(path);
+                    files = Directory.GetFiles(path);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    writer.WriteLine($"{indent}└── [Доступ запрещен]");
+                    return;
+                }
                 int totalItems = direcories.Length + files.Length;
                 int currentItem = 0;
                 foreach (string dir in direcories)
@@ -45,12 +55,27 @@
                 return;
             }
             string outFile = "tree.txt";
-            using (StreamWriter writer = new StreamWriter(outFile))
+            try
             {
-                writer.WriteLine($"Дерево каталога: {folderPath}");
-                WriteDirectoryTree(folderPath, maxDepth, writer);
+                using (StreamWriter writer = new StreamWriter(outFile))
+                {
+                    writer.WriteLine($"Дерево каталога: {folderPath}");
+                    WriteDirectoryTree(folderPath, maxDepth, writer);
+                }
+                Console.WriteLine($"\nДерево успешно записано в файл: {Path.GetFullPath(outFile)}");
             }
-            Console.WriteLine($"\nДерево успешно записано в файл: {Path.GetFullPath(outFile)}");
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Ошибка: Отказано в доступе. Запустите программу от имени администратора.");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка ввода-вывода: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Непредвиденная ошибка: {ex.Message}");
+            }
             Console.WriteLine("Данные успешно приняты. Нажмите Enter для выхода");
             Console.ReadLine();
         }
