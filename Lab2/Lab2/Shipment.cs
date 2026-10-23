@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lab2
 {
-    internal abstract class Shipment
+    public abstract class Shipment
     {
         private string _trackingNumber;
         private double _weight;
