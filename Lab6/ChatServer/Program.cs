@@ -10,6 +10,7 @@ int Port = args.Length > 0 ? int.Parse(args[0]) : 5555;
 
 var clients = new Dictionary<string, StreamWriter>();
 var lockObj = new object();
+const string LogFile = "chat.log";
 
 var listener = new TcpListener(IPAddress.Any, Port);
 listener.Start();
@@ -20,7 +21,14 @@ while (true)
     TcpClient client = await listener.AcceptTcpClientAsync();
     _ = HandleClientAsync(client);              // каждого клиента — в свою задачу
 }
-
+void LogToFile(string text)
+{
+    try
+    {
+        File.AppendAllText(LogFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {text}\n");
+    }
+    catch { }
+}
 async Task HandleClientAsync(TcpClient client)
 {
     var stream = client.GetStream();
@@ -45,6 +53,7 @@ async Task HandleClientAsync(TcpClient client)
             }
             break;
         }
+        LogToFile($"{nick} подключился");
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {nick} подключился");
         await BroadcastAsync($"*** {nick} вошёл в чат ***");
         string? line;
@@ -60,10 +69,37 @@ async Task HandleClientAsync(TcpClient client)
                 }
                 continue;
             }
+            if (line.StartsWith("/w "))
+            {
+                var parts = line.Split(' ', 3);
+                if (parts.Length < 3)
+                {
+                    _ = writer.WriteLineAsync("Использование: /w ник текст");
+                    continue;
+                }
+                string targetNick = parts[1];
+                string msgText = parts[2];
+
+                lock (lockObj)
+                {
+                    if (clients.TryGetValue(targetNick, out var targetWriter))
+                    {
+                        _ = targetWriter.WriteLineAsync($"[Личное от {nick}]: {msgText}");
+                        _ = writer.WriteLineAsync($"[Вы -> {targetNick}]: {msgText}");
+                        LogToFile($"{nick} -> {targetNick}: {msgText}");
+                    }
+                    else
+                    {
+                        _ = writer.WriteLineAsync($"Пользователь {targetNick} не найден.");
+                    }
+                }
+                continue;
+            }
+            LogToFile($"{nick}: {line}");
             await BroadcastAsync($"[{DateTime.Now:HH:mm:ss}] {nick}: {line}");
         }
     }
-    catch (IOException) { /* клиент оборвал соединение */ }
+    catch (IOException) { }
     catch (Exception ex) { Console.WriteLine($"Ошибка: {ex.Message}"); }
     finally
     {
@@ -71,6 +107,7 @@ async Task HandleClientAsync(TcpClient client)
         { 
             lock (lockObj) clients.Remove(nick);
             client.Close();
+            LogToFile($"{nick} отключился");
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {nick} отключился");
             await BroadcastAsync($"*** {nick} покинул чат ***");
         } 
@@ -85,6 +122,6 @@ async Task BroadcastAsync(string message)
     foreach (var w in snapshot)
     {
         try { await w.WriteLineAsync(message); }
-        catch (IOException) { /* отвалившийся клиент удалится в своей задаче */ }
+        catch (IOException) { }
     }
 }
