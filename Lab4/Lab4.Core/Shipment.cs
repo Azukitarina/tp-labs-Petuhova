@@ -9,14 +9,12 @@ namespace Lab4.Core
 {
     public abstract class Shipment : IComparable<Shipment>
     {
-        private string _trackingNumber;
-        private double _weight;
-        private bool _isUrgent;
+
         public string TrackingNumber { get; }
         public double Weight { get; }
         public bool IsUrgent { get; }
 
-        public Shipment(string trackingNumber, double weight, bool isUrgent)
+        protected Shipment(string trackingNumber, double weight, bool isUrgent)
         {
             if (string.IsNullOrWhiteSpace(trackingNumber))
                 throw new ArgumentException("Номер не может быть пустым", nameof(trackingNumber));
@@ -26,7 +24,7 @@ namespace Lab4.Core
             Weight = weight;
             IsUrgent = isUrgent;
         }
-        public int CompareTo(Shipment other)
+        public int CompareTo(Shipment? other)
         {
             if (other == null) return 1;
             return CalculateCost().CompareTo(other.CalculateCost());
