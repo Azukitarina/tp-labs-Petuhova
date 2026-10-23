@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lab2
 {
-    public abstract class Shipment
+    public abstract class Shipment : IComparable<Shipment>
     {
         private string _trackingNumber;
         private double _weight;
@@ -25,6 +25,11 @@ namespace Lab2
             TrackingNumber = trackingNumber;
             Weight = weight;
             IsUrgent = isUrgent;
+        }
+        public int CompareTo(Shipment other)
+        {
+            if (other == null) return 1;
+            return CalculateCost().CompareTo(other.CalculateCost());
         }
         public abstract decimal CalculateCost();
         public override string ToString()

@@ -15,6 +15,15 @@
             {
                 Console.WriteLine($"{s.ToString()} | Стоимость: {s.CalculateCost():F2} руб.");
             }
+            Console.WriteLine();
+            Console.WriteLine("Сортировка по цене");
+            var sorted = service.GetAll();
+            sorted.Sort();
+            foreach (var s in sorted)
+            {
+                Console.WriteLine($"{s.TrackingNumber}: {s.CalculateCost():F2} руб.");
+            }
+            service.PrintStatistics();
             Console.ReadLine();
         }
     }

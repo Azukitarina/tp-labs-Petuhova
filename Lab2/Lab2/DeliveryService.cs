@@ -22,5 +22,15 @@ namespace Lab2
         {
             return _shipments;
         }
+        public void PrintStatistics()
+        {
+            Console.WriteLine("\n статистика по типам");
+            var groups = _shipments.GroupBy(s => s.GetType().Name);
+            foreach ( var group in groups)
+            {
+                decimal totalCost = group.Sum(s => s.CalculateCost());
+                Console.WriteLine($"{group.Key}: {group.Count()} шт. на сумму {totalCost:F2} руб.");
+            }
+        }
     }
 }
