@@ -10,6 +10,7 @@ int Port = args.Length > 0 ? int.Parse(args[0]) : 5555;
 
 var clients = new Dictionary<string, StreamWriter>();
 var lockObj = new object();
+List<string> history = new List<string>();
 const string LogFile = "chat.log";
 
 var listener = new TcpListener(IPAddress.Any, Port);
@@ -55,6 +56,18 @@ async Task HandleClientAsync(TcpClient client)
         }
         LogToFile($"{nick} подключился");
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {nick} подключился");
+        lock (lockObj)
+        {
+            if (history.Count > 0)
+            {
+                _ = writer.WriteLineAsync("Последние сообщения");
+                foreach (var msg in history)
+                {
+                    _ = writer.WriteLineAsync(msg);
+                }
+                _ = writer.WriteLineAsync(" ");
+            }
+        }
         await BroadcastAsync($"*** {nick} вошёл в чат ***");
         string? line;
         while ((line = await reader.ReadLineAsync()) != null)
@@ -117,8 +130,12 @@ async Task HandleClientAsync(TcpClient client)
 async Task BroadcastAsync(string message)
 {
     List<StreamWriter> snapshot;
-    lock (lockObj) snapshot = clients.Values.ToList();  // копия под блокировкой
-
+    lock (lockObj)
+    {
+        snapshot = clients.Values.ToList();
+        history.Add(message);
+        if (history.Count > 10) history.RemoveAt(0);
+    }
     foreach (var w in snapshot)
     {
         try { await w.WriteLineAsync(message); }
