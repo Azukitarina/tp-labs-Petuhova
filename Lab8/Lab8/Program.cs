@@ -17,12 +17,8 @@ for (int i = 0; i < N; i++)
 
 // --- 2. Список уникальных покупателей ---
 var sw = Stopwatch.StartNew();
-var unique = new List<string>();
-for (int i = 0; i < buyers.Count; i++)
-{
-    if (!unique.Contains(buyers[i]))            // УЗКОЕ МЕСТО №1
-        unique.Add(buyers[i]);
-}
+var uniqueSet = new HashSet<string>(buyers);
+var unique = uniqueSet.ToList();
 Console.WriteLine($"Уникальных покупателей: {unique.Count}  ({sw.ElapsedMilliseconds} мс)");
 
 // --- 3. Текстовый отчёт ---
