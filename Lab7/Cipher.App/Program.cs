@@ -14,7 +14,7 @@ while (true)
     Console.WriteLine("0 - Выход");
     Console.Write("Выбор: ");
 
-    string choice = Console.ReadLine();
+    string? choice = Console.ReadLine();
     if (choice == "0") break;
 
     ICipher cipher = choice switch
@@ -27,13 +27,13 @@ while (true)
     if (cipher == null) { Console.WriteLine("Неверный выбор."); continue; }
 
     Console.Write("Введите текст: ");
-    string text = Console.ReadLine();
+    string? text = Console.ReadLine();
 
     Console.Write("Введите ключ (число для Цезаря, слово для Виженера): ");
-    string key = Console.ReadLine();
+    string? key = Console.ReadLine();
 
     Console.Write("1 - Зашифровать, 2 - Расшифровать: ");
-    string action = Console.ReadLine();
+    string? action = Console.ReadLine();
 
     try
     {

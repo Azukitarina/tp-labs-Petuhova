@@ -26,7 +26,7 @@ namespace Cipher.Tests
         public void Caesar_Punctuation_Unchanged()
         {
             var cipher = new CaesarCipher();
-            Assert.Equal("A b!1", cipher.Encrypt("A b!1", "1"));
+            Assert.Equal("B c!1", cipher.Encrypt("A b!1", "1"));
         }
 
         [Fact]
@@ -46,10 +46,10 @@ namespace Cipher.Tests
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void Vigenere_EmptyKey_ThrowsException(string key)
+        public void Vigenere_EmptyKey_ThrowsException(string? key)
         {
             var cipher = new VigenereCipher();
-            Assert.Throws<ArgumentException>(() => cipher.Encrypt("test", key));
+            Assert.Throws<ArgumentException>(() => cipher.Encrypt("test", key!));
         }
 
         [Fact]
